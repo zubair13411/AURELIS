@@ -1,20 +1,43 @@
 
+import os
 import torch
+from pathlib import Path
+from urllib.request import urlretrieve
 from torchvision import transforms
 
 from model import build_model
 from config import IMAGE_SIZE, CLASS_NAMES
 
+MODEL_URL = (
+    "https://huggingface.co/zubair13411/AURELIS/"
+    "resolve/main/aurelis_resnet18.pth"
+)
 
-def load_model(path, device=None):
+MODEL_CACHE = Path("models/best_model.pt")
+
+
+def download_model():
+    MODEL_CACHE.parent.mkdir(parents=True, exist_ok=True)
+
+    if not MODEL_CACHE.exists():
+        print("Downloading AURELIS model...")
+        urlretrieve(MODEL_URL, MODEL_CACHE)
+        print("Model download complete.")
+
+    return MODEL_CACHE
+
+
+def load_model(path=None, device=None):
     device = device or (
         "cuda" if torch.cuda.is_available() else "cpu"
     )
 
+    model_path = Path(path) if path else download_model()
+
     model = build_model(pretrained=False)
 
     state = torch.load(
-        path,
+        model_path,
         map_location=device,
         weights_only=True
     )
@@ -59,7 +82,7 @@ def predict_image(model, image):
         "label": CLASS_NAMES[idx],
         "confidence": confidence,
         "message": (
-            "Research prototype output only; "
-            "not a clinical conclusion."
+            "Experimental research output only; "
+            "not a clinical conclusion or diagnosis."
         )
     }
