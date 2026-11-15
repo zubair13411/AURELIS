@@ -7,12 +7,7 @@ from PIL import Image
 from inference import load_model, predict_image
 
 
-# --------------------------------------------------
 # AURELIS — Experimental Research Prototype
-# --------------------------------------------------
-
-BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "models" / "best_model.pt"
 
 st.set_page_config(
     page_title="AURELIS",
@@ -36,34 +31,31 @@ st.warning(
 
 st.divider()
 
+
 # Model Loading
 
 @st.cache_resource
 def get_model():
-    return load_model(str(MODEL_PATH))
+    return load_model()
 
 
 model = None
 
-if MODEL_PATH.exists():
-    try:
-        with st.spinner("Loading AURELIS model..."):
-            model = get_model()
+try:
+    with st.spinner(
+        "Downloading and loading AURELIS model..."
+    ):
+        model = get_model()
 
-        st.success("Model loaded successfully.")
+    st.success("Model loaded successfully.")
 
-    except Exception as exc:
-        st.error("The model could not be loaded.")
-        st.caption(f"Technical error: {exc}")
+except Exception as exc:
+    st.error("The model could not be loaded.")
+    st.caption(f"Technical error: {exc}")
 
-else:
-    st.info(
-        "The trained model weights are not installed yet. "
-        "The application interface is available, but image "
-        "analysis is disabled until the model weights are added."
-    )
 
 st.divider()
+
 
 # Image Upload
 
@@ -87,8 +79,8 @@ if uploaded_file is not None:
 
         if model is None:
             st.warning(
-                "Analysis is unavailable because trained "
-                "model weights have not been installed."
+                "Analysis is unavailable because the "
+                "trained model could not be loaded."
             )
 
         elif st.button("Analyze Image", type="primary"):
@@ -120,6 +112,7 @@ if uploaded_file is not None:
     except Exception as exc:
         st.error("Unable to process the uploaded image.")
         st.caption(f"Technical error: {exc}")
+
 
 # Footer
 
