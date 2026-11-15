@@ -1,128 +1,63 @@
-
-from pathlib import Path
-
 import streamlit as st
 from PIL import Image
-
-from inference import load_model, predict_image
-
-
-# AURELIS — Experimental Research Prototype
+from inference import load_session, predict_image
 
 st.set_page_config(
-    page_title="AURELIS",
-    page_icon="🫁",
-    layout="wide"
+    page_title="AURELIS | Research Prototype",
+    page_icon="🩺",
+    layout="centered"
 )
 
 st.title("AURELIS")
-st.subheader("AI-Powered Pneumonia Screening Research Prototype")
-
-st.caption(
-    "Experimental chest X-ray image classification "
-    "using a ResNet-18 deep learning model."
-)
+st.subheader("Experimental Chest X-ray Classification")
 
 st.warning(
-    "IMPORTANT: AURELIS is an experimental research prototype. "
-    "It is not clinically validated and must not be used for "
-    "medical diagnosis, treatment, or real-world triage."
+    "RESEARCH PROTOTYPE ONLY: This tool is not clinically validated. "
+    "It must not be used for diagnosis, treatment, or medical triage. "
+    "Always consult qualified healthcare professionals."
 )
 
-st.divider()
-
-
-# Model Loading
-
-@st.cache_resource
-def get_model():
-    return load_model()
-
-
-model = None
-
-try:
-    with st.spinner(
-        "Downloading and loading AURELIS model..."
-    ):
-        model = get_model()
-
-    st.success("Model loaded successfully.")
-
-except Exception as exc:
-    st.error("The model could not be loaded.")
-    st.caption(f"Technical error: {exc}")
-
-
-st.divider()
-
-
-# Image Upload
-
-st.header("Chest X-ray Analysis")
+st.markdown(
+    "Upload a chest X-ray image to explore the experimental "
+    "machine-learning model output."
+)
 
 uploaded_file = st.file_uploader(
-    "Upload a chest X-ray image",
-    type=["png", "jpg", "jpeg"]
+    "Upload Chest X-ray",
+    type=["jpg", "jpeg", "png"]
 )
 
 if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert("RGB")
 
-    try:
-        image = Image.open(uploaded_file).convert("RGB")
+    st.image(
+        image,
+        caption="Uploaded X-ray image",
+        use_container_width=True
+    )
 
-        st.image(
-            image,
-            caption="Uploaded chest X-ray",
-            width=450
-        )
+    if st.button("Run Experimental Analysis", type="primary"):
+        try:
+            with st.spinner("Loading model and processing image..."):
+                session = load_session()
+                result = predict_image(session, image)
 
-        if model is None:
-            st.warning(
-                "Analysis is unavailable because the "
-                "trained model could not be loaded."
-            )
-
-        elif st.button("Analyze Image", type="primary"):
-
-            with st.spinner("Processing image..."):
-                result = predict_image(model, image)
-
-            st.divider()
-            st.header("Research Model Output")
-
-            st.metric(
-                "Classification",
-                result["label"]
-            )
-
-            st.metric(
-                "Model Confidence",
-                f'{result["confidence"]:.1%}'
+            st.subheader("Experimental Model Output")
+            st.write("**Result:**", result["label"])
+            st.write(
+                "**Model confidence:**",
+                f'{result["confidence"] * 100:.2f}%'
             )
 
             st.info(result["message"])
 
-            st.caption(
-                "This is an experimental model output, "
-                "not a medical diagnosis. A qualified healthcare "
-                "professional must interpret medical images."
-            )
-
-    except Exception as exc:
-        st.error("Unable to process the uploaded image.")
-        st.caption(f"Technical error: {exc}")
-
-
-# Footer
+        except Exception as error:
+            st.error("Unable to process the image.")
+            st.exception(error)
 
 st.divider()
 
 st.caption(
-    "AURELIS | AI Research Project | ResNet-18"
-)
-
-st.caption(
-    "For educational and research purposes only. "
-    "Not intended for clinical use."
+    "AURELIS | Educational and research purposes only. "
+    "Not a medical device or diagnostic system."
 )
