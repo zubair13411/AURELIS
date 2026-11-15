@@ -4,7 +4,7 @@ from pathlib import Path
 import streamlit as st
 from PIL import Image
 
-from src.inference import load_model, predict_image
+from inference import load_model, predict_image
 
 
 # --------------------------------------------------
@@ -36,9 +36,7 @@ st.warning(
 
 st.divider()
 
-# --------------------------------------------------
 # Model Loading
-# --------------------------------------------------
 
 @st.cache_resource
 def get_model():
@@ -67,9 +65,7 @@ else:
 
 st.divider()
 
-# --------------------------------------------------
 # Image Upload
-# --------------------------------------------------
 
 st.header("Chest X-ray Analysis")
 
@@ -125,9 +121,7 @@ if uploaded_file is not None:
         st.error("Unable to process the uploaded image.")
         st.caption(f"Technical error: {exc}")
 
-# --------------------------------------------------
 # Footer
-# --------------------------------------------------
 
 st.divider()
 
