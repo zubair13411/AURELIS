@@ -1,0 +1,37 @@
+{
+    "project": "AURELIS",
+    "model": "ResNet-18",
+    "test_images": 624,
+    "class_mapping": {
+        "NORMAL": 0,
+        "PNEUMONIA": 1
+    },
+    "accuracy": 0.8301282051282052,
+    "precision": 0.7921810699588477,
+    "recall": 0.9871794871794872,
+    "f1_score": 0.8789954337899544,
+    "specificity": 0.5683760683760684,
+    "balanced_accuracy": 0.7777777777777778,
+    "baseline": {
+        "Accuracy": 0.625,
+        "Precision": 0.625,
+        "Recall": 1.0,
+        "F1 Score": 0.7692307692307693
+    },
+    "confusion_matrix": [
+        [
+            133,
+            101
+        ],
+        [
+            5,
+            385
+        ]
+    ],
+    "true_negatives": 133,
+    "false_positives": 101,
+    "false_negatives": 5,
+    "true_positives": 385,
+    "best_validation_accuracy": 0.9674329501915708,
+    "roc_auc": 0.9435020819636204
+}
